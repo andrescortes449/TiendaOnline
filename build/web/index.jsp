@@ -20,7 +20,7 @@
 
   <!-- Baner superior -->
   <header class="header">
-    <img src="img/logo.png" alt="Logo Tienda" class="logo">
+    <img src="img/logo.png" alt="Logo Tienda" class="logo"/>
     <h1 class="titulo">Tienda Deportiva Online</h1>
   </header>
 
@@ -31,6 +31,7 @@
       <li><a href="#servicios">Servicios</a></li>
       <li><a href="#contacto">Contáctenos</a></li>
       <li><a href="#cotizacion">Solicitud de Cotización</a></li>
+      <li><a href="FormularioCuenta.jsp">Crear Ceunta</a></li>
     </ul>
   </nav>
 
