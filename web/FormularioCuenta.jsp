@@ -60,7 +60,7 @@ if (nombre != null && apodo != null && colorCabello != null && colorOjos != null
             out.println("<p>Había una vez una persona de " + edad + " años llamada <strong>" + nombre + "</strong>, ");
             out.println("pero todos la conocían cariñosamente como <strong>\"" + apodo + "\"</strong>.</p>");
             
-            out.println("<p>Con su hermoso cabello <strong>" + colorCabello + "</strong> y sus ojos <strong>" + colorOjos + "</strong>, ");
+            out.println("<p>Con su cabello <strong>" + colorCabello + "</strong> y sus ojos <strong>" + colorOjos + "</strong>, ");
             out.println(apodo + " tenía una gran pasión que lo definía: <strong>" + hobby + "</strong>.</p>");
             
             out.println("<p>Un día, " + apodo + " decidió visitar la mejor tienda deportiva online de la ciudad. ");
