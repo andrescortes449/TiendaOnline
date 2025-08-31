@@ -147,7 +147,30 @@
 
                         <div class="campo">
                             <label for="ciudad">Ciudad de Entrega *</label>
-                            <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Bogotá, Medellín, Cali">
+
+                            <select id="ciudad" name="ciudad" required>
+                                <option value="">-- Selecciona una ciudad --</option>
+                                <option value="Bogotá">Bogotá</option>
+                                <option value="Medellín">Medellín</option>
+                                <option value="Cali">Cali</option>
+                                <option value="Barranquilla">Barranquilla</option>
+                                <option value="Cartagena">Cartagena</option>
+                                <option value="Cúcuta">Cúcuta</option>
+                                <option value="Bucaramanga">Bucaramanga</option>
+                                <option value="Pereira">Pereira</option>
+                                <option value="Santa Marta">Santa Marta</option>
+                                <option value="Ibagué">Ibagué</option>
+                                <option value="Manizales">Manizales</option>
+                                <option value="Villavicencio">Villavicencio</option>
+                                <option value="Pasto">Pasto</option>
+                                <option value="Montería">Montería</option>
+                                <option value="Neiva">Neiva</option>
+                                <option value="Armenia">Armenia</option>
+                                <option value="Sincelejo">Sincelejo</option>
+                                <option value="Valledupar">Valledupar</option>
+                                <option value="Popayán">Popayán</option>
+                                <option value="Tunja">Tunja</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -155,7 +178,7 @@
 
                 <!-- Botones -->
                 <div class="botones-formulario">
-                    <button type="submit" class="boton-enviar">🚀 Solicitar Cotización</button>
+                    <button type="submit" class="boton-enviar">🚀 Enviar Datos</button>
                     <button type="reset" class="boton-limpiar">🔄 Limpiar Formulario</button>
                 </div>
 
