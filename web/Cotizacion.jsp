@@ -1,16 +1,17 @@
 <%-- 
     Document   : Cotizacion
-    Created on : 31/08/2025, 10:59:06 a. m.
+    Created on : 31/08/2025, 10:59:06 a. m.
     Author     : User
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.sql.*"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Diseña tu Cuento - Tienda Deportiva Online</title>
+        <title>Solicitud de Cotización - Tienda Deportiva Online</title>
         <link href="css/styleCotizacion.css" rel="stylesheet" type="text/css"/>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,16 +31,99 @@
                 <li><a href="index.jsp">Nuestra Tienda On-line</a></li>
                 <li><a href="index.jsp#servicios">Servicios</a></li>
                 <li><a href="index.jsp#contacto">Contáctenos</a></li>
-                <li><a href="index.jsp#cotizacion">Solicitud de Cotización</a></li>
-                <li><a href="FormularioCuenta.jsp" class="active">Diseña tu Cuento</a></li>
+                <li><a href="Cotizacion.jsp" class="active">Solicitud de Cotización</a></li>
+                <li><a href="FormularioCuenta.jsp">Diseña tu Cuento</a></li>
             </ul>
         </nav>
+
+        <%
+        // Técnica de la Unidad 2: Recibir datos del formulario usando request.getParameter()
+        String nombre = request.getParameter("nombre");
+        String email = request.getParameter("email");
+        String telefono = request.getParameter("telefono");
+        String empresa = request.getParameter("empresa");
+        String descripcion = request.getParameter("descripcion");
+        String entrega = request.getParameter("entrega");
+        String ciudad = request.getParameter("ciudad");
+        
+        // Recibir productos seleccionados (como array)
+        String[] productosSeleccionados = request.getParameterValues("producto");
+        
+        // Verificar si se enviaron datos (como en el ejemplo de la Unidad 2)
+        if (nombre != null && email != null && telefono != null && ciudad != null) {
+            // Si hay datos, procesarlos y guardar en base de datos
+            
+            // Procesar productos seleccionados
+            String productosTexto = "";
+            String cantidadesTexto = "";
+            
+            if (productosSeleccionados != null) {
+                for (String producto : productosSeleccionados) {
+                    productosTexto += producto + ",";
+                    
+                    // Obtener cantidad para cada producto
+                    String cantidadParam = "cantidad_" + producto.replace(" ", "_");
+                    String cantidad = request.getParameter(cantidadParam);
+                    if (cantidad != null) {
+                        cantidadesTexto += cantidad + ",";
+                    }
+                }
+                
+                // Quitar la última coma
+                if (productosTexto.length() > 0) {
+                    productosTexto = productosTexto.substring(0, productosTexto.length() - 1);
+                    cantidadesTexto = cantidadesTexto.substring(0, cantidadesTexto.length() - 1);
+                }
+            }
+            
+            // Conexión a base de datos (según técnicas de la Unidad 3)
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                Connection conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/tienda_cotizaciones?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "root", "");
+                
+                // Insertar datos usando PreparedStatement
+                String sql = "INSERT INTO cotizaciones (nombre, email, telefono, empresa, productos_seleccionados, cantidades, descripcion, fecha_entrega, ciudad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmt = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                
+                stmt.setString(1, nombre);
+                stmt.setString(2, email);
+                stmt.setString(3, telefono);
+                stmt.setString(4, empresa != null ? empresa : "");
+                stmt.setString(5, productosTexto);
+                stmt.setString(6, cantidadesTexto);
+                stmt.setString(7, descripcion != null ? descripcion : "");
+                stmt.setString(8, entrega != null && !entrega.isEmpty() ? entrega : null);
+                stmt.setString(9, ciudad);
+                
+                int resultado = stmt.executeUpdate();
+                
+                if (resultado > 0) {
+                    // Obtener el ID generado
+                    ResultSet generatedKeys = stmt.getGeneratedKeys();
+                    int cotizacionId = 0;
+                    if (generatedKeys.next()) {
+                        cotizacionId = generatedKeys.getInt(1);
+                    }
+                    
+                    // Redirigir a página de resultados
+                    response.sendRedirect("ResultadoCotizacion.jsp?id=" + cotizacionId);
+                } else {
+                    out.println("<div class='error' style='color: red; padding: 20px; text-align: center;'>Error al procesar la cotización. Intente nuevamente.</div>");
+                }
+                
+                conexion.close();
+            } catch (Exception e) {
+                out.println("<div class='error' style='color: red; padding: 20px; text-align: center;'>Error de conexión: " + e.getMessage() + "</div>");
+            }
+            
+        } else {
+            // Si no hay datos, mostrar el formulario
+        %>
 
         <section id="cotizacion" class="seccion">
             <h2>Solicitud de Cotización</h2>
 
-
-            <form class="formulario-cotizacion" action="#" method="POST">
+            <form class="formulario-cotizacion" action="Cotizacion.jsp" method="POST">
 
                 <!-- Información Personal -->
                 <div class="seccion-formulario">
@@ -66,6 +150,7 @@
                         </div>
                     </div>
                 </div>
+                
                 <!-- Detalles de la Cotización -->
                 <div class="seccion-formulario">
                     <h3>🛒 Detalles de la Cotización</h3>
@@ -83,52 +168,53 @@
                             <td>Balón de Fútbol</td>
                             <td>$30.000</td>
                             <td><input type="checkbox" name="producto" value="Balon Futbol"></td>
-                            <td><input type="number" name="cantidad_Balon Futbol" class="cantidad" value="1" min="1"></td>
+                            <td><input type="number" name="cantidad_Balon_Futbol" class="cantidad" value="1" min="1"></td>
                         </tr>
                         <tr>
                             <td><img src="img/tenis.png" alt="Tenis" class="producto"></td>
                             <td>Tenis Deportivos</td>
                             <td>$80.000</td>
                             <td><input type="checkbox" name="producto" value="Tenis Deportivos"></td>
-                            <td><input type="number" name="cantidad_Tenis Deportivos" class="cantidad" value="1" min="1"></td>
+                            <td><input type="number" name="cantidad_Tenis_Deportivos" class="cantidad" value="1" min="1"></td>
                         </tr>
                         <tr>
                             <td><img src="img/guantes.png" alt="Guantes" class="producto"></td>
                             <td>Guantes de Boxeo</td>
                             <td>$45.000</td>
                             <td><input type="checkbox" name="producto" value="Guantes Boxeo"></td>
-                            <td><input type="number" name="cantidad_Guantes Boxeo" class="cantidad" value="1" min="1"></td>
+                            <td><input type="number" name="cantidad_Guantes_Boxeo" class="cantidad" value="1" min="1"></td>
                         </tr>
                         <tr>
                             <td><img src="img/camisa1.png" alt="Camisa1" class="producto"></td>
-                            <td>Guantes de Boxeo</td>
+                            <td>Camisa Deportiva Hombre</td>
                             <td>$45.000</td>
                             <td><input type="checkbox" name="producto" value="camisa1"></td>
-                            <td><input type="number" name="cantidad_Guantes Boxeo" class="cantidad" value="1" min="1"></td>
+                            <td><input type="number" name="cantidad_camisa1" class="cantidad" value="1" min="1"></td>
                         </tr>
                         <tr>
                             <td><img src="img/camisa2.png" alt="camisa2" class="producto"></td>
-                            <td>Guantes de Boxeo</td>
+                            <td>Camisa Deportiva Casual</td>
                             <td>$45.000</td>
                             <td><input type="checkbox" name="producto" value="camisa2"></td>
-                            <td><input type="number" name="cantidad_Guantes Boxeo" class="cantidad" value="1" min="1"></td>
+                            <td><input type="number" name="cantidad_camisa2" class="cantidad" value="1" min="1"></td>
                         </tr>
                         <tr>
                             <td><img src="img/pantalon.png" alt="pantalon" class="producto"></td>
-                            <td>Guantes de Boxeo</td>
+                            <td>Pantalón Deportivo</td>
                             <td>$45.000</td>
-                            <td><input type="checkbox" name="producto" value="pnatalon"></td>
-                            <td><input type="number" name="cantidad_Guantes Boxeo" class="cantidad" value="1" min="1"></td>
+                            <td><input type="checkbox" name="producto" value="pantalon"></td>
+                            <td><input type="number" name="cantidad_pantalon" class="cantidad" value="1" min="1"></td>
                         </tr>
                         <tr>
                             <td><img src="img/camisamujer.png" alt="camisamujer" class="producto"></td>
-                            <td>Guantes de Boxeo</td>
+                            <td>Camisa Deportiva Mujer</td>
                             <td>$45.000</td>
                             <td><input type="checkbox" name="producto" value="camisaMujer"></td>
-                            <td><input type="number" name="cantidad_Guantes Boxeo" class="cantidad" value="1" min="1"></td>
+                            <td><input type="number" name="cantidad_camisaMujer" class="cantidad" value="1" min="1"></td>
                         </tr>
                     </table>
                 </div>
+                
                 <!-- Información Adicional -->
                 <div class="seccion-formulario">
                     <h3>📝 Información Adicional</h3>
@@ -147,7 +233,6 @@
 
                         <div class="campo">
                             <label for="ciudad">Ciudad de Entrega *</label>
-
                             <select id="ciudad" name="ciudad" required>
                                 <option value="">-- Selecciona una ciudad --</option>
                                 <option value="Bogotá">Bogotá</option>
@@ -175,11 +260,10 @@
                     </div>
                 </div>
 
-
                 <!-- Botones -->
                 <div class="botones-formulario">
                     <button type="submit" class="boton-enviar">🚀 Enviar Datos</button>
-                    <button type="reset" class="boton-limpiar">🔄 Limpiar Formulario</button>
+                    <button type="button" class="boton-limpiar" onclick="window.location.href='index.jsp'">❌ Cancelar</button>
                 </div>
 
                 <div class="nota-formulario">
@@ -187,5 +271,10 @@
                 </div>
             </form>
         </section>
+        
+        <%
+            }
+        %>
+
     </body>
 </html>

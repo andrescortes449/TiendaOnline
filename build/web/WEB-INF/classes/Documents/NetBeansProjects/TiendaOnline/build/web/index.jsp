@@ -31,7 +31,7 @@
                 <li><a href="#servicios">Servicios</a></li>
                 <li><a href="#contacto">Contáctenos</a></li>
                 <li><a href="Cotizacion.jsp">Solicitud de Cotización</a></li>
-                <li><a href="FormularioCuenta.jsp">Crear Ceunta</a></li>
+                <li><a href="FormularioCuenta.jsp">Crear Cuento</a></li>
             </ul>
         </nav>
 
